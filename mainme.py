@@ -59,7 +59,7 @@ class inputData:
 
 
 # 输出数据的类，将数据通过相应的对象输出到excel中
-class outputData:
+class policy:
     # A
     Year = []
     # B
@@ -120,6 +120,7 @@ wb = vb.load_workbook('Test.xlsx')
 ws = wb["Main"]
 
 # print(list(ws.rows))
+# why data1
 data1 = ws['A']
 # print(data1[1].value)
 # print(ws['A2'].value)
@@ -138,7 +139,7 @@ inData = inputData(ws['B2'].value, ws['B3'].value, ws['B4'].value, ws['B5'].valu
 inData.printAllInputData()
 
 # 定义对象
-outData = outputData()
+outData = policy()
 
 # 给Year赋值
 outData.Year = list(range(41))
@@ -190,14 +191,18 @@ for item in range(1, 41):
         outData.Last_Death.append(0)
 
 # 给AK赋值，需要U
-
+#Assume U are all positive for now
 # =IF(AND(OR(C19>Age.FirstWD,C19>Age.AnnuityComm),U18>0,C19<Age.Death),1,0)
-# outData.Withdrawal_Phase.append('')
-# for item in range(1,41):
-#     if (outData.Age[item] > inData.First_Withdrawal_Age or outData.Age[item] > inData.Annuity_Commencement_Date) and
+outData.Withdrawal_Phase.append('')
+for item in range(1,41):
+    if (outData.Age[item] > inData.First_Withdrawal_Age or outData.Age[item] > inData.Annuity_Commencement_Date) and outData.Age[item]<inData.Last_Death_Age:
+        outData.Withdrawal_Phase.append(1)
+    else:
+        outData.Withdrawal_Phase.append(0)
 
 print(outData.Eligible_Step_Up)
 print(outData.Growth_Phase)
+print(outData.Withdrawal_Phase)
 print(outData.Last_Death)
 
 
@@ -212,14 +217,22 @@ ws2 = wb2["Main"]
 ws2.cell(1, 1).value = "Year"
 ws2.cell(1, 2).value = "Anniversary"
 ws2.cell(1, 3).value = "Age"
+
+ws2.cell(1, 35).value = "Eligible_Step_UP"
+ws2.cell(1, 36).value = "Growth_Phase"
+ws2.cell(1, 37).value = "WithDrawal_Phase"
+ws2.cell(1, 38).value ="Automatic Periodic Benefit Status"
+ws2.cell(1, 39).value = "Last_Death"
+
 for item in range(0, 41):
     ws2.cell(item + 2, 1).value = outData.Year[item]
     ws2.cell(item + 2, 2).value = outData.Anniversary[item]
     ws2.cell(item + 2, 3).value = outData.Age[item]
 
-    # AI、AJ、AM
+    # AI、AJ、AK,AM
     ws2.cell(item + 2, 35).value = outData.Eligible_Step_Up[item]
     ws2.cell(item + 2, 36).value = outData.Growth_Phase[item]
+    ws2.cell(item + 2, 37).value = outData.Withdrawal_Phase[item]
 
     ws2.cell(item + 2, 39).value = outData.Last_Death[item]
 
