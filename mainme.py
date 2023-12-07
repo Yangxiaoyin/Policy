@@ -1,6 +1,8 @@
 import openpyxl as vb
 from openpyxl import Workbook, load_workbook
 from datetime import datetime, timedelta
+import xlsxwriter
+
 
 # 读取数据类，将input数据读到对应的对象中
 class inputData:
@@ -208,33 +210,37 @@ print(outData.Last_Death)
 
 
 
-
+# Workbook() takes one, non-optional, argument
+# which is the filename that we want to create.
+workbook = xlsxwriter.Workbook('TestOut.xlsx')
+worksheet = workbook.add_worksheet("cashFlowOutput")
+workbook.close()
 
 
 # 输出到excel表中
 wb2 = vb.load_workbook('TestOut.xlsx')
-ws2 = wb2["Main"]
-ws2.cell(1, 1).value = "Year"
-ws2.cell(1, 2).value = "Anniversary"
-ws2.cell(1, 3).value = "Age"
+wsOutput = wb2["cashFlowOutput"]
+wsOutput.cell(1, 1).value = "Year"
+wsOutput.cell(1, 2).value = "Anniversary"
+wsOutput.cell(1, 3).value = "Age"
 
-ws2.cell(1, 35).value = "Eligible_Step_UP"
-ws2.cell(1, 36).value = "Growth_Phase"
-ws2.cell(1, 37).value = "WithDrawal_Phase"
-ws2.cell(1, 38).value ="Automatic Periodic Benefit Status"
-ws2.cell(1, 39).value = "Last_Death"
+wsOutput.cell(1, 35).value = "Eligible_Step_UP"
+wsOutput.cell(1, 36).value = "Growth_Phase"
+wsOutput.cell(1, 37).value = "WithDrawal_Phase"
+wsOutput.cell(1, 38).value = "Automatic Periodic Benefit Status"
+wsOutput.cell(1, 39).value = "Last_Death"
 
 for item in range(0, 41):
-    ws2.cell(item + 2, 1).value = outData.Year[item]
-    ws2.cell(item + 2, 2).value = outData.Anniversary[item]
-    ws2.cell(item + 2, 3).value = outData.Age[item]
+    wsOutput.cell(item + 2, 1).value = outData.Year[item]
+    wsOutput.cell(item + 2, 2).value = outData.Anniversary[item]
+    wsOutput.cell(item + 2, 3).value = outData.Age[item]
 
     # AI、AJ、AK,AM
-    ws2.cell(item + 2, 35).value = outData.Eligible_Step_Up[item]
-    ws2.cell(item + 2, 36).value = outData.Growth_Phase[item]
-    ws2.cell(item + 2, 37).value = outData.Withdrawal_Phase[item]
+    wsOutput.cell(item + 2, 35).value = outData.Eligible_Step_Up[item]
+    wsOutput.cell(item + 2, 36).value = outData.Growth_Phase[item]
+    wsOutput.cell(item + 2, 37).value = outData.Withdrawal_Phase[item]
 
-    ws2.cell(item + 2, 39).value = outData.Last_Death[item]
+    wsOutput.cell(item + 2, 39).value = outData.Last_Death[item]
 
 wb2.save('TestOut.xlsx')
 wb2.close()
