@@ -114,6 +114,14 @@ class policy:
     # AM
     Last_Death = []
 
+    Fund1_Return=[]
+    Fund2_Return=[]
+    Rebalance_Indicator=[]
+    DF=[]
+    qx=[]
+    Death_Claims=[]
+    Withdrawal_Claims=[]
+
     def outputToExcel(self):
         pass
 
@@ -193,7 +201,7 @@ for item in range(1, 41):
         outData.Last_Death.append(0)
 
 # 给AK赋值，需要U
-#Assume U are all positive for now
+#Assume U are all positive for now, will modify later
 # =IF(AND(OR(C19>Age.FirstWD,C19>Age.AnnuityComm),U18>0,C19<Age.Death),1,0)
 outData.Withdrawal_Phase.append('')
 for item in range(1,41):
@@ -201,13 +209,31 @@ for item in range(1,41):
         outData.Withdrawal_Phase.append(1)
     else:
         outData.Withdrawal_Phase.append(0)
+# Assign value to AL #Assume U are all positive for now, will modify later
+#=IF(C23>=Age.Death,0,IF(AND(AK22=1,U22=0),1,AL22))
+outData.Automatic_Periodic_Benefit_Status.append('')
+for item in range(1,41): #item starting with 1
+    if(outData.Age[item]>inData.Last_Death_Age):
+        outData.Automatic_Periodic_Benefit_Status.append(0)
+    #elif(outData.Withdrawal_Phase[item]==1 and outData.AV_Post_Death_Claims[item]==0):
+    elif(outData.Withdrawal_Phase[item-1]==1):
+        outData.Automatic_Periodic_Benefit_Status.append(1)
+    else: #need to modify here
+        outData.Automatic_Periodic_Benefit_Status.append(1)
+        #outData.Automatic_Periodic_Benefit_Status[item]=outData.Automatic_Periodic_Benefit_Status[item-1]
 
+
+outData.Fund1_Return.append('')
+for item in range(1,41): #item starting with 1
+    outData.Fund1_Return.append(inData.Risk_Free_Rate)
+
+
+# those prints can be hidden
 print(outData.Eligible_Step_Up)
 print(outData.Growth_Phase)
 print(outData.Withdrawal_Phase)
 print(outData.Last_Death)
-
-
+print(outData.Automatic_Periodic_Benefit_Status)
 
 
 # Workbook() takes one, non-optional, argument
@@ -230,6 +256,11 @@ wsOutput.cell(1, 37).value = "WithDrawal_Phase"
 wsOutput.cell(1, 38).value = "Automatic Periodic Benefit Status"
 wsOutput.cell(1, 39).value = "Last_Death"
 
+wsOutput.cell(1, 41).value = "Fund1 Return"
+wsOutput.cell(1, 42).value = "Fund2 Return"
+wsOutput.cell(1, 43).value = "Rebalance indicator"
+wsOutput.cell(1, 44).value = "DF"
+
 for item in range(0, 41):
     wsOutput.cell(item + 2, 1).value = outData.Year[item]
     wsOutput.cell(item + 2, 2).value = outData.Anniversary[item]
@@ -239,8 +270,14 @@ for item in range(0, 41):
     wsOutput.cell(item + 2, 35).value = outData.Eligible_Step_Up[item]
     wsOutput.cell(item + 2, 36).value = outData.Growth_Phase[item]
     wsOutput.cell(item + 2, 37).value = outData.Withdrawal_Phase[item]
+    wsOutput.cell(item + 2, 38).value = outData.Automatic_Periodic_Benefit_Status[item]
 
     wsOutput.cell(item + 2, 39).value = outData.Last_Death[item]
+
+    #AO AP AQ Fund1 Return Fund2 Return Rebalance Indicator
+    wsOutput.cell(item + 2, 41).value = outData.Fund1_Return[item]
+    wsOutput.cell(item + 2, 41).number_format='0.00%'
+
 
 wb2.save('TestOut.xlsx')
 wb2.close()
