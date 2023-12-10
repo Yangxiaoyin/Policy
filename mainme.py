@@ -204,30 +204,32 @@ inData.printAllInputData()
 outData = policy()
 # ==================Part ONE: to calculate C,D,Age,contribution; AJ,AI,AM(status table),AO,AP(Fund Return),AR(DF),AT(Mortality Rate)========
 # =========================================第一部分（可直接求出值的数据）===============================================
+# Hard coded part: start year and max_index
+max_index = 41
 # Assign value to A(index)
 # 给A赋值，完成
-outData.Year = list(range(41))
+outData.Year = list(range(max_index))
 # Assign B as year
 # 给B赋值，完成
 start_date = datetime(2016, 8, 1)
-end_date = datetime(2056, 8, 1)
+end_date = datetime(start_date.year + max_index - 1, start_date.month, start_date.day)
 current_date = start_date
 while current_date <= end_date:
     outData.Anniversary.append(current_date.strftime("%Y/%m/%d"))
     current_date = current_date.replace(year=current_date.year + 1)
 # Assign C as age
 # 给C赋值，完成
-outData.Age = list(range(60, 101))
+outData.Age = list(range(60, 60 + max_index))
 # Assign D as contribution (All assumed as 0 in the table)
 # 给D赋值，完成
-for item in range(0, 41):
+for item in range(0, max_index):
     outData.Contribution.append(0)
 
 # Assign AJ as Growth_phase
 # 给AJ赋值，完成
 # =IF(AND(C19<=Age.FirstWD,C19<=Age.AnnuityComm,C19<Age.Death),1,0)
 outData.Growth_Phase.append('')
-for item in range(1, 41):
+for item in range(1, max_index):
     if outData.Age[item] <= inData.First_Withdrawal_Age and outData.Age[item] <= inData.Annuity_Commencement_Date and \
             outData.Age[item] <= inData.Last_Death_Age:
         outData.Growth_Phase.append(1)
@@ -238,7 +240,7 @@ for item in range(1, 41):
 # 给AI赋值，需要已知AJ19，完成
 # =IF(AND(A19<=StepUp.Yr,AJ19=1),1,0)
 outData.Eligible_Step_Up.append('')
-for item in range(1, 41):
+for item in range(1, max_index):
     if outData.Year[item] <= inData.Step_Up_Period and outData.Growth_Phase[item] == 1:
         outData.Eligible_Step_Up.append(1)
     else:
@@ -247,7 +249,7 @@ for item in range(1, 41):
 # Assign AM as last death
 # 给AM赋值，完成
 outData.Last_Death.append('')
-for item in range(1, 41):
+for item in range(1, max_index):
     if outData.Age[item] == inData.Last_Death_Age:
         outData.Last_Death.append(1)
     else:
@@ -256,13 +258,13 @@ for item in range(1, 41):
 # Assign AO as fixed fund return
 # AO，完成
 outData.Fund1_Return.append('')
-for item in range(1, 41):  # item starting with 1
+for item in range(1, max_index):  # item starting with 1
     outData.Fund1_Return.append(inData.Risk_Free_Rate)
 
 # Assign AP with normal distribution as Fund_Return2
 # 给AP赋值，完成
 outData.Fund2_Return.append('')
-for item in range(1, 41):
+for item in range(1, max_index):
     random_number = random.random()  # 生成0到1之间的随机数
     norm_inverse = norm.ppf(random_number, loc=0, scale=1)  # 生成符合正态分布的随机数
     # =EXP(LN(1 +$E$6)-0.5 *$E$7 ^ 2 +$E$7 * NORMINV(RAND(), 0, 1))-1
@@ -271,12 +273,12 @@ for item in range(1, 41):
 
 # Assign AR as DiscountFactor
 # 给AR赋值，完成
-for item in range(0, 41):
+for item in range(0, max_index):
     outData.DF.append((1 + inData.Risk_Free_Rate) ** -outData.Year[item])
 
 # 给AT赋值，完成
 # Need to read qx from reference_assumption table
-for item in range(0, 41):
+for item in range(0, max_index):
     outData.qx.append(0.005)
 
 # print(outData.Year)
@@ -435,7 +437,7 @@ outData.Withdrawal_Phase.append('')
 # =IF(AND(OR(C19>Age.FirstWD,C19>Age.AnnuityComm),U18>0,C19<Age.Death),1,0)，AK19需要U18
 
 # ===============================================================
-# for item in range(1, 41):
+# for item in range(1, max_index):
 #     if (outData.Age[item] > inData.First_Withdrawal_Age or outData.Age[item] > inData.Annuity_Commencement_Date) and \
 #             outData.AV_Post_Death_Claims[item-1] > 0 and outData.Age[item] < inData.Last_Death_Age:
 #         outData.Withdrawal_Phase.append(1)
@@ -449,7 +451,7 @@ outData.Automatic_Periodic_Benefit_Status.append('')
 # =IF(C20>=Age.Death,0,IF(AND(AK19=1,U19=0),1,AL19))
 # AL19 ====================================================================
 # outData.Automatic_Periodic_Benefit_Status.append(0)
-# for item in range(2, 41):  # item starting with 1
+# for item in range(2, max_index):  # item starting with 1
 #     if outData.Age[item] > inData.Last_Death_Age:
 #         outData.Automatic_Periodic_Benefit_Status.append(0)
 #     # elif(outData.Withdrawal_Phase[item]==1 and outData.AV_Post_Death_Claims[item]==0): 错误写法
@@ -693,7 +695,7 @@ outData.Rider_Charges = outData.Rider_Charge
 
 # =========================Part Four: to calculate with Iterator ===================================================
 # =================================================第四部分（通过循环计算所有数据）=======================================
-for item in range(2, 41):  # 从20行开始 # Start from row20
+for item in range(2, max_index):  # 从20行开始 # Start from row20
     # 给F_item赋值，  F_item=X_item-1 * (1+AO_item)
     outData.Fund1_Pre_Fee.append(outData.Fund1_Post_Rebalance[item - 1] * (1 + outData.Fund1_Return[item]))
     # 给G_item赋值，  G_item=Y_item-1 * (1+AP_item)
@@ -778,7 +780,7 @@ for item in range(2, 41):  # 从20行开始 # Start from row20
     # item表示18+item行的数据
     iterative_solver(item)
     # 更新完U和AC之后，给其余变量赋值
-    #After updating U and AC, assign value to rest of variables
+    # After updating U and AC, assign value to rest of variables
 
     # 给AB_item赋值，  AB_item=MAX(0,AB_item-1*(1-AT_item)+D_item-H_item-L_item-1-P_item)，AT19暂时用0.005表示，在M_item之后可求=============================
     outData.Death_Benefit_base.append(
@@ -932,7 +934,7 @@ wsOutput.cell(2, 50).value = outData.PV_DB_Claim
 wsOutput.cell(2, 51).value = outData.PV_WB_Claim
 wsOutput.cell(2, 52).value = outData.PV_RC
 
-for item in range(0, 41):
+for item in range(0, max_index):
     # A、B、C、D
     wsOutput.cell(item + 2, 1).value = outData.Year[item]
     wsOutput.cell(item + 2, 2).value = outData.Anniversary[item]
@@ -984,8 +986,8 @@ for item in range(0, 41):
     wsOutput.cell(item + 2, 39).value = outData.Last_Death[item]
 
     # AO AP AQ Fund1 Return Fund2 Return Rebalance Indicator
-    wsOutput.cell(item + 2, 41).value = outData.Fund1_Return[item]
-    wsOutput.cell(item + 2, 41).number_format = '0.00%'
+    wsOutput.cell(item + 2, max_index).value = outData.Fund1_Return[item]
+    wsOutput.cell(item + 2, max_index).number_format = '0.00%'
     # AP
     wsOutput.cell(item + 2, 42).value = outData.Fund2_Return[item]
     wsOutput.cell(item + 2, 42).number_format = '0.00%'
