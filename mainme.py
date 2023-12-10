@@ -197,7 +197,7 @@ inData = inputData(ws['B2'].value, ws['B3'].value, ws['B4'].value, ws['B5'].valu
                    ws['E7'].value, ws['G4'].value, ws['G5'].value, ws['G6'].value, ws['G7'].value, ws['H4'].value,
                    ws['H5'].value,
                    ws['H6'].value, ws['H7'].value)
-inData.printAllInputData()
+#inData.printAllInputData()
 
 # Define output Object
 # 定义对象
@@ -1002,7 +1002,7 @@ for item in range(0, max_index):
     wsOutput.cell(item + 2, 48).value = outData.Withdrawal_Claims[item]
     wsOutput.cell(item + 2, 49).value = outData.Rider_Charges[item]
 
-wb2.save('TestOut.xlsx')
+wb2.save('CashflowOut.xlsx')
 wb2.close()
 
 # wb.close()
