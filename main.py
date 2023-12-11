@@ -189,6 +189,7 @@ inData = inputData(ws['B2'].value, ws['B3'].value, ws['B4'].value, ws['B5'].valu
                    ws['E7'].value, ws['G4'].value, ws['G5'].value, ws['G6'].value, ws['G7'].value, ws['H4'].value,
                    ws['H5'].value,
                    ws['H6'].value, ws['H7'].value)
+
 #inData.printAllInputData()
 
 # Define output Object
@@ -911,8 +912,8 @@ for item in range(0, max_index):
     wsOutput.cell(item + 2, 39).value = outData.Last_Death[item]
 
     # AO AP AQ Fund1 Return Fund2 Return Rebalance Indicator
-    wsOutput.cell(item + 2, max_index).value = outData.Fund1_Return[item]
-    wsOutput.cell(item + 2, max_index).number_format = '0.00%'
+    wsOutput.cell(item + 2,41).value = outData.Fund1_Return[item]
+    wsOutput.cell(item + 2,41).number_format = '0.00%'
     # AP
     wsOutput.cell(item + 2, 42).value = outData.Fund2_Return[item]
     wsOutput.cell(item + 2, 42).number_format = '0.00%'
